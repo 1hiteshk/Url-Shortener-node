@@ -1,31 +1,33 @@
 const express = require("express");
 const { connectToMongoDB } = require("./connect");
-const urlRoute = require("./routes/url");
-const URL = require("./models/url");
-const path = require('path');
-const staticRoute = require("./routes/staticRouter");
+const path = require("path");
 const app = express();
 const PORT = 8001;
 
+const urlRoute = require("./routes/url");
+const URL = require("./models/url");
+const staticRoute = require("./routes/staticRouter");
+const userRoute = require("./routes/user");
 connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
   console.log("Mongodb connected")
 );
 
-app.use(express.json());  // to support json data
-app.use(express.urlencoded({ extended: false }));  // to support form data
+app.use(express.json()); // to support json data
+app.use(express.urlencoded({ extended: false })); // to support form data
 
-app.set('view engine', `ejs`);
-app.set('views', path.resolve('./views'))
+app.set("view engine", `ejs`);
+app.set("views", path.resolve("./views"));
 
 //server side rendering
 app.get("/test", async (req, res) => {
   const allUrls = await URL.find({});
-  return res.render('home', {
+  return res.render("home", {
     urls: allUrls,
-  })  // server side rendering
+  }); // server side rendering
 });
 
 app.use("/url", urlRoute);
+app.use("/user", userRoute)
 app.use("/", staticRoute);
 
 app.get("/url/:shortId", async (req, res) => {
@@ -37,7 +39,7 @@ app.get("/url/:shortId", async (req, res) => {
     {
       $push: {
         visitHistory: {
-          timestamp:new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toUTCString(),
+          timestamp: new Date(Date.now() + 5.5 * 60 * 60 * 1000).toUTCString(),
         },
       },
     }

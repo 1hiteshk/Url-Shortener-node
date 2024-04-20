@@ -1,0 +1,1 @@
+#1. if you are not authenticated you cant visit / i.e home page
